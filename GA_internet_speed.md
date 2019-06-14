@@ -3,7 +3,7 @@ Internet speeds in GA
 Nick Thieme
 6/12/2019
 
-\#\#\#Introduction This is the code that goes along with the 6/12/2019
+### Introduction This is the code that goes along with the 6/12/2019
 AJC story “Internet far slower in Georgia than reported.”
 
 ### Library
@@ -127,7 +127,7 @@ FROM
   
   FROM 
   `measurement-lab.release.ndt_downloads` tests,
-  `sonic-silo-236615.GA_internet.us_counties` counties
+  `NAME_OF_PROJECT.NAME_OF_BUCKET.NAME_OF_DATASET.GA_internet.us_counties` counties
   WHERE
   connection_spec.server_geolocation.country_name = 'United States'
   AND (connection_spec.server_geolocation.region = 'Georgia' OR
@@ -347,7 +347,7 @@ df_counties <- D%>%select(GEOID, geometry)
 #to_dataflow_string(df_counties, "BQ_geo.csv")
 ```
 
-\#\#\#A brief aside in Google BigQuery to get BigRQuery to work
+### A brief aside in Google BigQuery to get BigRQuery to work
 
 The meat of the analysis is done in Google BigQuery because M-Lab
 provides a free way to work with their large internet speed database on
@@ -378,7 +378,7 @@ BigQuery know what form the data you’re uploading is in. Name the first
 “districts” and the second “Values.” These names are important because
 they match the SQL calls you’ll make later. Set the Type for the first
 to “STRING” and the second to “GEOGRAPHY.” The table should appear under
-your dataset. Finally, update the quest point\_graph\_BQ above to
+your dataset. Finally, update the query point\_graph\_BQ above to
 reflect the names of the datasets you uploaded and the geographic region
 you’re interested in. For generality, I’m showing a map of the entire
 U.S. below. Update project below to your project name.
@@ -392,7 +392,7 @@ often have hundreds of millions of tests, doing it locally just isn’t
 possible.
 
 ``` r
-point_data<-query_exec(point_graph_BQ, project = "sonic-silo-236615", use_legacy_sql=FALSE, max_pages = Inf)
+point_data<-query_exec(point_graph_BQ, project = "NAME OF PROJECT", use_legacy_sql=FALSE, max_pages = Inf)
 ```
 
     ## Registered S3 method overwritten by 'openssl':
@@ -431,7 +431,7 @@ point_data_sf_GA<-point_data_sf %>% na.omit %>% mutate(speed_mlab_c=cut(med, cut
 )
 ```
 
-\#\#\#R mapping
+### R mapping
 
 This section takes the data we’ve gotten and crunched, and turns it into
 a map. Because the underlying data is technically point data
@@ -509,16 +509,22 @@ That data is put together and made publicly available online at
 Each dataset is about 400 MB. To run the code below, download all of the
 FCC releases, ranging from December 2014 to December 2017, and upload
 them to your Google Bucket. Import them into separate tables in your
-BigQuery dataset with names that you choose. Then update Big\_Q above to
+BigQuery dataset with names that you choose. Then update big\_Q above to
 reflect the names of your FCC tables, and you should be good to
 go.
+
+big\_Q is a pretty involved query so it may not be immediately clear what's going on or wrong with it. I've found that it's a lot easier to debug these queries in BigQuery itself. The lag between error and a retooled query is shorter, and simple errors are caught prior to running.  
 
 ``` r
 D_state_county<-query_exec(big_Q, project = project,use_legacy_sql=FALSE, max_pages = Inf )
 
-D_state_county %>% filter(time_period=="dec_2017"&str_sub(geo_id,1,2)=="13") %>% 
+D_state_county %>% filter(time_period=="dec_2017"&str_sub(geo_id,1,2)=="STATE FIPS CODE") %>% 
   summarise(fcc_dl =median(advertised_down), dl= median(med_dl_Mbps)) #25 fcc, 6.26 mlab
 
 point_data_sf_GA %>% filter(str_sub(county,1,2)=="13") %>% summarise(sum(counts), sum(ips), median(med))
   pull(counts) %>% sum
 ```
+
+### Questions or Comments
+
+If you have any questions or comments, I'm all ears. Please write me at nicholas.thieme@ajc.com
