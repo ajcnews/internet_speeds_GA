@@ -3,8 +3,8 @@ Internet speeds in GA
 Nick Thieme
 6/12/2019
 
-### Introduction This is the code that goes along with the 6/12/2019
-AJC story “Internet far slower in Georgia than reported.”
+### Introduction 
+This is the code that goes along with the 6/12/2019 AJC story “Internet far slower in Georgia than reported" at <https://www.ajc.com/news/state--regional-govt--politics/internet-far-slower-georgia-than-reported/cwH1H8cW7onEF6d2aoaVeN/>
 
 ### Library
 
